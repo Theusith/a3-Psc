@@ -1,6 +1,6 @@
 package Entity;
 
-public class Login {
+public class Usuarios {
 
     private int codigo;
     private String nome;

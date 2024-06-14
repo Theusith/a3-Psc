@@ -1,5 +1,8 @@
 package Controller;
 
+import java.sql.Statement;
+import java.sql.*;
+import Conexao.Conexao;
 import Model.Administrador;
 import Model.Cliente;
 import Model.Pessoa;
@@ -19,9 +22,16 @@ public class GerenciadorContas {
      * Construtor da classe GerenciadorContas.
      * Inicializa as listas de clientes e administradores e adiciona um administrador padrão.
      */
-    public GerenciadorContas() {
+    public GerenciadorContas(String usuarios) {
         this.clientes = new ArrayList<>();
         this.administradores = new ArrayList<>();
+        try {
+            this.proximoId = encontrarMaiorId(usuarios) + 1; // Encontra e incrementa
+        } catch (SQLException e) {
+            System.err.println("Erro ao inicializar próximo ID: " + e.getMessage());
+            // Tratar o erro de forma adequada (lançar exceção, usar valor padrão, etc.)
+            this.proximoId = 1; // Valor padrão em caso de erro
+        }
         // Adicionar conta de administrador pré-existente
         adicionarAdministradorPadrao("adm", "adm", "ADM001");
     }
@@ -31,9 +41,34 @@ public class GerenciadorContas {
      *
      * @return o próximo ID disponível.
      */
-    public int gerarProximoId() {
-        return proximoId++;
+    public int getProximoId() {
+        return proximoId;
     }
+
+    public static int encontrarMaiorId(String usuarios) throws SQLException {
+        String sql = "SELECT MAX(id) FROM " + usuarios;
+
+        try (Connection conexao = Conexao.getConexao().getConnection(); // Obtém a conexão
+             Statement stmt = conexao.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            } else {
+                throw new SQLException("Tabela vazia ou ID não encontrado.");
+            }
+        }
+    }
+
+    public void incrementarProximoId() {
+        try {
+            this.proximoId = encontrarMaiorId("usuarios") + 1; // Encontra e incrementa
+        } catch (SQLException e) {
+            System.err.println("Erro ao incrementar próximo ID: " + e.getMessage());
+            // Tratar o erro de forma adequada (lançar exceção, usar valor padrão, etc.)
+        }
+    }
+
 
     /**
      * Método para adicionar um administrador pré-existente.
@@ -112,4 +147,5 @@ public class GerenciadorContas {
         System.out.println("Cliente removido com sucesso!");
     }
 }
+
 

@@ -4,33 +4,32 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import Entity.Login;
+import Entity.Usuarios;
 import Entity.TabelaReservas;
-import Model.Reserva;
 import Conexao.Conexao;
 
 public class TabelasDAO {
 
-    public void cadastrarUsuario1(Login login) {
+    public void cadastrarUsuario(Usuarios dados) {
         Connection conn = null;
-        PreparedStatement psLogin = null;
+        PreparedStatement psDados = null;
     
-        String sqlLogin = "INSERT INTO LOGIN (NOME, CPF, EMAIL, SENHA) VALUES (?, ?, ?, ?)";
+        String sqlDados = "INSERT INTO DADOS (NOME, CPF, EMAIL, SENHA) VALUES (?, ?, ?, ?)";
     
         try {
-            conn = Conexao.getConexao();
+            conn = (Connection) Conexao.getConexao();
             conn.setAutoCommit(false); // Desabilita autocommit para transação
     
             // Inserção na tabela USUARIO
-            psLogin = conn.prepareStatement(sqlLogin, PreparedStatement.RETURN_GENERATED_KEYS);
-            psLogin.setString(1, login.getNome());
-            psLogin.setString(2, login.getCpf());
-            psLogin.setString(3, login.getEmail());
-            psLogin.setString(4, login.getSenha());
-            psLogin.executeUpdate();
+            psDados = conn.prepareStatement(sqlDados, PreparedStatement.RETURN_GENERATED_KEYS);
+            psDados.setString(1, dados.getNome());
+            psDados.setString(2, dados.getCpf());
+            psDados.setString(3, dados.getEmail());
+            psDados.setString(4, dados.getSenha());
+            psDados.executeUpdate();
     
             // Recuperar o ID gerado
-            ResultSet rs = psLogin.getGeneratedKeys();
+            ResultSet rs = psDados.getGeneratedKeys();
             if (rs != null && rs.next()) {
                 int codigoUsuario = rs.getInt(1);
                 // Você pode usar o códigoUsuario para o que precisar.
@@ -49,7 +48,7 @@ public class TabelasDAO {
             e.printStackTrace();
         } finally {
             try {
-                if (psLogin != null) psLogin.close();
+                if (psDados != null) psDados.close();
                 if (conn != null) conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -57,14 +56,14 @@ public class TabelasDAO {
         }
     }
     
-   public void cadastrarUsuario2(TabelaReservas tabelaReservas) {
+   public void cadastrarReserva(TabelaReservas tabelaReservas) {
     Connection conn = null;
     PreparedStatement pstabelaReservas = null;
 
     String sqlReserva = "INSERT INTO RESERVAS (ORIGEM , DESTINO, DATA_VIAGEM) VALUES (?, ?, ?)";
 
     try {
-        conn = Conexao.getConexao();
+        conn = (Connection) Conexao.getConexao();
         conn.setAutoCommit(false); // Desabilita autocommit para transação
 
         // Inserção na tabela RESERVAS

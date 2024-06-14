@@ -5,10 +5,11 @@ import Model.Cliente;
 import Model.Pessoa;
 import Model.Reserva;
 
+import java.sql.SQLException;
 import java.util.Scanner;
 
 import DAO.TabelasDAO;
-import Entity.Login;
+import Entity.Usuarios;
 import Entity.TabelaReservas;
 
 /**
@@ -25,7 +26,7 @@ public class SistemaReservas {
      * Inicializa os gerenciadores de contas e reservas, além do scanner para entrada de dados.
      */
     public SistemaReservas() {
-        this.gerenciadorContas = new GerenciadorContas();
+        this.gerenciadorContas = new GerenciadorContas("usuarios");
         this.gerenciadorReservas = new GerenciadorReservas();
         this.scanner = new Scanner(System.in);
     }
@@ -91,7 +92,7 @@ public class SistemaReservas {
      * Solicita os dados do cliente e cria a conta.
      */
     private void criarConta() {
-        Login l = new Login();
+        Usuarios l = new Usuarios();
         System.out.println("=== Criar Conta ===");
         System.out.print("Nome: ");
         String nome = scanner.nextLine();
@@ -106,10 +107,15 @@ public class SistemaReservas {
         String senha = scanner.nextLine();
         l.setSenha(senha);
 
-        new TabelasDAO().cadastrarUsuario1(l);
+        new TabelasDAO().cadastrarUsuario(l);
+
+        // Incrementar o próximo ID no gerenciador de contas
+        gerenciadorContas.incrementarProximoId();
+
+        int novoId = gerenciadorContas.getProximoId();
 
         // Criar um novo cliente com os dados fornecidos
-        Cliente novoCliente = new Cliente(gerenciadorContas.gerarProximoId(), nome, cpf, email, senha);
+        Cliente novoCliente = new Cliente(novoId,nome, cpf, email, senha);
 
         // Adicionar o novo cliente ao gerenciador de contas
         gerenciadorContas.adicionarCliente(novoCliente);
@@ -281,7 +287,7 @@ public class SistemaReservas {
                 String dataViagem = scanner.nextLine();
                 t.setDataViagem(dataViagem);
 
-                new TabelasDAO().cadastrarUsuario2(t);
+                new TabelasDAO().cadastrarReserva(t);
 
                 // Criar uma nova reserva com os detalhes fornecidos
                 Reserva novaReserva = new Reserva(cliente, origem, destino, dataViagem);

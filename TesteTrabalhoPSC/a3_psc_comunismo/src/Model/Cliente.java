@@ -24,6 +24,7 @@ public class Cliente extends Pessoa {
         this.reservas = new ArrayList<>();
     }
 
+
     /**
      * Exibe todas as reservas do cliente.
      * Se o cliente não tiver reservas, uma mensagem será exibida.

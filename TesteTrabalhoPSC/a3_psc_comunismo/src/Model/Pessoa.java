@@ -118,6 +118,4 @@ public abstract class Pessoa {
     public String toString() {
         return "Nome: " + nome + "\nId: " + iD;
     }
-
-    public abstract int getCodigo();
 }
