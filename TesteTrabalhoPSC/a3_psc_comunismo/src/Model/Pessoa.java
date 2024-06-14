@@ -4,24 +4,43 @@ package Model;
  * Representa uma pessoa no sistema de reservas.
  * Esta é uma classe abstrata que serve como base para outras classes específicas, como Cliente e Administrador.
  */
-public abstract class Pessoa {
+public class Pessoa {
     protected int iD;
     protected String nome;
     protected String cpf;
     protected String email;
     protected String senha;
 
-    /**
-     * Construtor da classe Pessoa.
-     *
-     * @param iD    o identificador único da pessoa.
-     * @param nome  o nome da pessoa.
-     * @param cpf   o CPF da pessoa.
-     * @param email o email da pessoa.
-     * @param senha a senha da pessoa.
-     */
-    public Pessoa(int iD, String nome, String cpf, String email, String senha) {
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+
+    protected String tipo;
+
+    public String getMatricula() {
+        return matricula;
+    }
+
+    public void setMatricula(String matricula) {
+        this.matricula = matricula;
+    }
+
+    public int getiD() {
+        return iD;
+    }
+
+    public void setiD(int iD) {
         this.iD = iD;
+    }
+
+    protected String matricula;
+
+
+    public Pessoa(String nome, String cpf, String email, String senha) {
         this.nome = nome;
         this.cpf = cpf;
         this.email = email;

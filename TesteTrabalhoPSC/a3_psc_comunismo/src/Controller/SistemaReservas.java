@@ -5,11 +5,10 @@ import Model.Cliente;
 import Model.Pessoa;
 import Model.Reserva;
 
-import java.sql.SQLException;
+import java.util.Objects;
 import java.util.Scanner;
 
 import DAO.TabelasDAO;
-import Entity.Usuarios;
 import Entity.TabelaReservas;
 
 /**
@@ -26,7 +25,7 @@ public class SistemaReservas {
      * Inicializa os gerenciadores de contas e reservas, além do scanner para entrada de dados.
      */
     public SistemaReservas() {
-        this.gerenciadorContas = new GerenciadorContas("usuarios");
+        this.gerenciadorContas = new GerenciadorContas();
         this.gerenciadorReservas = new GerenciadorReservas();
         this.scanner = new Scanner(System.in);
     }
@@ -77,10 +76,10 @@ public class SistemaReservas {
         Pessoa pessoaLogada = gerenciadorContas.autenticarPessoa(email, senha);
         if (pessoaLogada != null) {
             System.out.println("Login bem-sucedido!");
-            if (pessoaLogada instanceof Administrador) {
-                exibirMenuAdministrador((Administrador) pessoaLogada);
-            } else if (pessoaLogada instanceof Cliente) {
-                exibirMenuPrincipal((Cliente) pessoaLogada);
+            if (Objects.equals(pessoaLogada.getTipo(), "Administrador")) {
+                exibirMenuAdministrador();
+            } else if (Objects.equals(pessoaLogada.getTipo(), "Cliente")) {
+                exibirMenuPrincipal();
             }
         } else {
             System.out.println("Email ou senha incorretos. Tente novamente.");
@@ -92,43 +91,26 @@ public class SistemaReservas {
      * Solicita os dados do cliente e cria a conta.
      */
     private void criarConta() {
-        Usuarios l = new Usuarios();
         System.out.println("=== Criar Conta ===");
         System.out.print("Nome: ");
         String nome = scanner.nextLine();
-        l.setNome(nome);
         System.out.print("CPF: ");
         String cpf = scanner.nextLine();
-        l.setCpf(cpf);
         System.out.print("Email: ");
         String email = scanner.nextLine();
-        l.setEmail(email);
         System.out.print("Senha: ");
         String senha = scanner.nextLine();
-        l.setSenha(senha);
+        String tipo = "Cliente";
+        Cliente l = new Cliente(nome, cpf, email, senha);
+        l.setTipo(tipo);
 
-        new TabelasDAO().cadastrarUsuario(l);
+        new GerenciadorContas().cadastrarCliente(l);
 
-        // Incrementar o próximo ID no gerenciador de contas
-        gerenciadorContas.incrementarProximoId();
-
-        int novoId = gerenciadorContas.getProximoId();
-
-        // Criar um novo cliente com os dados fornecidos
-        Cliente novoCliente = new Cliente(novoId,nome, cpf, email, senha);
-
-        // Adicionar o novo cliente ao gerenciador de contas
-        gerenciadorContas.adicionarCliente(novoCliente);
-
-        System.out.println("Conta criada com sucesso!\nO seu ID é: " + novoCliente.getId());
+        System.out.println("Conta criada com sucesso!");
     }
 
-    /**
-     * Exibe o menu principal para o cliente logado.
-     *
-     * @param cliente o cliente logado.
-     */
-    private void exibirMenuPrincipal(Cliente cliente) {
+
+    private void exibirMenuPrincipal() {
         boolean sair = false;
         while (!sair) {
             System.out.println("\n=== Menu Principal ===");
@@ -144,19 +126,19 @@ public class SistemaReservas {
 
             switch (opcao) {
                 case '1':
-                    criarNovaReserva(cliente);
+                    criarNovaReserva(pessoaLogada);
                     break;
                 case '2':
-                    cliente.getReservas();
+                    pessoaLogada.getReservas();
                     break;
                 case '3':
-                    editarReserva(cliente);
+                    editarReserva(pessoaLogada);
                     break;
                 case '4':
-                    excluirReserva(cliente);
+                    excluirReserva(pessoaLogada);
                     break;
                 case '5':
-                    excluirConta(cliente);
+                    //excluirConta(cliente);
                     sair = true; // Forçar logout após excluir conta
                     break;
                 case '6':
@@ -168,29 +150,21 @@ public class SistemaReservas {
         }
     }
 
-    /**
-     * Exclui a conta de um cliente.
-     *
-     * @param cliente o cliente cuja conta será excluída.
-     */
-    private void excluirConta(Cliente cliente) {
-        System.out.println("=== Excluir Conta ===");
-        System.out.print("Tem certeza que deseja excluir sua conta? (S/N): ");
-        String confirmacao = scanner.nextLine();
-        if (confirmacao.equalsIgnoreCase("S")) {
-            gerenciadorContas.removerCliente(cliente);
-            System.out.println("Conta excluída com sucesso!");
-        } else {
-            System.out.println("Operação cancelada.");
-        }
-    }
 
-    /**
-     * Exibe o menu de administrador para o administrador logado.
-     *
-     * @param administrador o administrador logado.
-     */
-    private void exibirMenuAdministrador(Administrador administrador) {
+//    private void excluirConta(Cliente cliente) {
+//        System.out.println("=== Excluir Conta ===");
+//        System.out.print("Tem certeza que deseja excluir sua conta? (S/N): ");
+//        String confirmacao = scanner.nextLine();
+//        if (confirmacao.equalsIgnoreCase("S")) {
+//            gerenciadorContas.removerCliente(cliente);
+//            System.out.println("Conta excluída com sucesso!");
+//        } else {
+//            System.out.println("Operação cancelada.");
+//        }
+//    }
+
+
+    private void exibirMenuAdministrador() {
         boolean sair = false;
         while (!sair) {
             System.out.println("\n=== Menu Administrador ===");
@@ -220,7 +194,7 @@ public class SistemaReservas {
                 case 3:
                     System.out.println("Digite o ID:");
                     int id = scanner.nextInt();
-                    gerenciadorContas.removerCliente(id);
+      //              gerenciadorContas.removerCliente(id);
                     break;
                 case 4:
                     sair = true;

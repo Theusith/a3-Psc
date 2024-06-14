@@ -1,151 +1,203 @@
 package Controller;
 
-import java.sql.Statement;
 import java.sql.*;
 import Conexao.Conexao;
+
 import Model.Administrador;
 import Model.Cliente;
 import Model.Pessoa;
 
-import java.util.ArrayList;
-import java.util.List;
 
-/**
- * Classe responsável por gerenciar contas de clientes e administradores.
- */
 public class GerenciadorContas {
-    private List<Cliente> clientes;
-    private List<Administrador> administradores;
-    private static int proximoId = 1;
 
-    /**
-     * Construtor da classe GerenciadorContas.
-     * Inicializa as listas de clientes e administradores e adiciona um administrador padrão.
-     */
-    public GerenciadorContas(String usuarios) {
-        this.clientes = new ArrayList<>();
-        this.administradores = new ArrayList<>();
+    public GerenciadorContas() {
+        adicionarAdministradorPadrao();
+
+    }
+    public void cadastrarCliente(Cliente usuario) {
+        Connection conn = null;
+        PreparedStatement psDados = null;
+
+        String sqlDados = "INSERT INTO USUARIOS (NOME, CPF, EMAIL, SENHA, TIPO) VALUES (?, ?, ?, ?, ?)";
+
         try {
-            this.proximoId = encontrarMaiorId(usuarios) + 1; // Encontra e incrementa
+            conn = Conexao.getConexao();
+            conn.setAutoCommit(false); // Desabilita autocommit para transação
+
+            // Inserção na tabela USUARIO
+            psDados = conn.prepareStatement(sqlDados, PreparedStatement.RETURN_GENERATED_KEYS);
+            psDados.setString(1, usuario.getNome());
+            psDados.setString(2, usuario.getCpf());
+            psDados.setString(3, usuario.getEmail());
+            psDados.setString(4, usuario.getSenha());
+            psDados.setString(5, usuario.getTipo());
+            psDados.executeUpdate();
+            System.out.println("Usuário cadastrado com sucesso!");
+
+            conn.commit(); // Commit da transação
+
         } catch (SQLException e) {
-            System.err.println("Erro ao inicializar próximo ID: " + e.getMessage());
-            // Tratar o erro de forma adequada (lançar exceção, usar valor padrão, etc.)
-            this.proximoId = 1; // Valor padrão em caso de erro
-        }
-        // Adicionar conta de administrador pré-existente
-        adicionarAdministradorPadrao("adm", "adm", "ADM001");
-    }
-
-    /**
-     * Gera um novo ID para uma nova conta.
-     *
-     * @return o próximo ID disponível.
-     */
-    public int getProximoId() {
-        return proximoId;
-    }
-
-    public static int encontrarMaiorId(String usuarios) throws SQLException {
-        String sql = "SELECT MAX(id) FROM " + usuarios;
-
-        try (Connection conexao = Conexao.getConexao().getConnection(); // Obtém a conexão
-             Statement stmt = conexao.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-
-            if (rs.next()) {
-                return rs.getInt(1);
-            } else {
-                throw new SQLException("Tabela vazia ou ID não encontrado.");
+            if (conn != null) {
+                try {
+                    conn.rollback(); // Rollback em caso de erro
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            e.printStackTrace();
+        } finally {
+            try {
+                if (psDados != null) psDados.close();
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         }
     }
 
-    public void incrementarProximoId() {
+    private void adicionarAdministradorPadrao() {
+        boolean adicionado = false;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
         try {
-            this.proximoId = encontrarMaiorId("usuarios") + 1; // Encontra e incrementa
+            Connection conexao = Conexao.getConexao(); // Obtém a conexão existente
+            String sql = "SELECT * FROM usuarios WHERE tipo = 'Administrador' "; // Sua consulta SQL
+            stmt = conexao.prepareStatement(sql);
+            rs = stmt.executeQuery();
+
+            if (!rs.next()) {
+                Pessoa ps = new Pessoa("Administrador", "000000000000", "Administrador@adm.com", "Administrador");
+                String tipo = "Administrador";
+                ps.setMatricula("01");
+                ps.setTipo(tipo);
+                Connection conn = null;
+                PreparedStatement psDados = null;
+
+                String sqlDados = "INSERT INTO USUARIOS (NOME, CPF, EMAIL, SENHA, TIPO) VALUES (?, ?, ?, ?, ?)";
+
+                try {
+                    conn = Conexao.getConexao();
+                    conn.setAutoCommit(false); // Desabilita autocommit para transação
+
+                    // Inserção na tabela USUARIO
+                    psDados = conn.prepareStatement(sqlDados, PreparedStatement.RETURN_GENERATED_KEYS);
+                    psDados.setString(1, ps.getNome());
+                    psDados.setString(2, ps.getCpf());
+                    psDados.setString(3, ps.getEmail());
+                    psDados.setString(4, ps.getSenha());
+                    psDados.setString(5, ps.getTipo());
+                    psDados.executeUpdate();
+                    System.out.println("Administrador Cadastrado com sucesso!");
+
+                    conn.commit(); // Commit da transação
+
+                } catch (SQLException e) {
+                    if (conn != null) {
+                        try {
+                            conn.rollback(); // Rollback em caso de erro
+                        } catch (SQLException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (psDados != null) psDados.close();
+                        if (conn != null) conn.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
         } catch (SQLException e) {
-            System.err.println("Erro ao incrementar próximo ID: " + e.getMessage());
-            // Tratar o erro de forma adequada (lançar exceção, usar valor padrão, etc.)
-        }
-    }
-
-
-    /**
-     * Método para adicionar um administrador pré-existente.
-     *
-     * @param email    o email do administrador.
-     * @param senha    a senha do administrador.
-     * @param matricula a matrícula do administrador.
-     */
-    private void adicionarAdministradorPadrao(String email, String senha, String matricula) {
-        Administrador administrador = new Administrador(proximoId++, "Administrador", "", email, senha, matricula);
-        administradores.add(administrador);
-    }
-
-    /**
-     * Adiciona um novo cliente à lista de clientes.
-     *
-     * @param novoCliente o novo cliente a ser adicionado.
-     */
-    public void adicionarCliente(Cliente novoCliente) {
-        clientes.add(novoCliente);
-    }
-
-    /**
-     * Obtém um cliente pelo seu ID.
-     *
-     * @param id o ID do cliente a ser obtido.
-     * @return o cliente com o ID especificado, ou null se não for encontrado.
-     */
-    public Cliente obterClientePorId(int id) {
-        for (Cliente cliente : clientes) {
-            if (cliente.getId() == id) {
-                System.out.println(cliente);
-                return cliente;
+            e.printStackTrace();
+        } finally {
+            // Fechar recursos (ResultSet, PreparedStatement) aqui
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
+
         }
-        return null;
     }
 
-    /**
-     * Remove um cliente da lista de clientes.
-     *
-     * @param cliente o cliente a ser removido.
-     */
-    public void removerCliente(Cliente cliente) {
-        clientes.remove(cliente);
-    }
+        public Pessoa autenticarPessoa (String email, String senha){
+            PreparedStatement stmt = null;
+            ResultSet rs = null;
+            Pessoa cl = null;
 
-    /**
-     * Autentica uma pessoa (cliente ou administrador) com base no email e senha fornecidos.
-     *
-     * @param email o email da pessoa.
-     * @param senha a senha da pessoa.
-     * @return a pessoa autenticada (Cliente ou Administrador), ou null se a autenticação falhar.
-     */
-    public Pessoa autenticarPessoa(String email, String senha) {
-        for (Cliente cliente : clientes) {
-            if (cliente.getEmail().equals(email) && cliente.getSenha().equals(senha)) {
-                return cliente;
+            try {
+                Connection conexao = Conexao.getConexao();
+                String sql = "SELECT * FROM usuarios WHERE email = ? and senha = ?";
+                stmt = conexao.prepareStatement(sql);
+                stmt.setString(1, email);
+                stmt.setString(2, senha);
+                rs = stmt.executeQuery();
+
+                if (rs.next()) {
+                    int id1 = rs.getInt("ID");
+                    String nome = rs.getString("NOME");
+                    String cpf = rs.getString("CPF");
+                    email = rs.getString("EMAIL");
+                    senha = rs.getString("SENHA");
+                    String matricula = rs.getString("MATRICULA");
+                    String tipo = rs.getString("TIPO");
+                    cl = new Pessoa(nome, cpf, email, senha);
+                    cl.setTipo(tipo);
+                }
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                // Fechar recursos (ResultSet, PreparedStatement) aqui
+                try {
+                    if (rs != null) rs.close();
+                    if (stmt != null) stmt.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
+            return cl; // Pessoa não encontrada ou senha incorreta
         }
-        for (Administrador administrador : administradores) {
-            if (administrador.getEmail().equals(email) && administrador.getSenha().equals(senha)) {
-                return administrador;
-            }
-        }
-        return null; // Pessoa não encontrada ou senha incorreta
-    }
 
-    /**
-     * Remove um cliente da lista de clientes pelo seu ID.
-     *
-     * @param id o ID do cliente a ser removido.
-     */
-    public void removerCliente(int id) {
-        clientes.removeIf(cliente -> cliente.getId() == id);
-        System.out.println("Cliente removido com sucesso!");
-    }
+        public Cliente obterClientePorId ( int id){
+            Cliente cliente = null;
+            PreparedStatement stmt = null;
+            ResultSet rs = null;
+
+            try {
+                Connection conexao = Conexao.getConexao(); // Obtém a conexão existente
+                String sql = "SELECT * FROM usuarios WHERE id = ?"; // Sua consulta SQL
+                stmt = conexao.prepareStatement(sql);
+                stmt.setInt(1, id);
+                rs = stmt.executeQuery();
+
+                if (rs.next()) {
+                    String id1 = rs.getString("id");
+                    String nome = rs.getString("NOME");
+                    String cpf = rs.getString("CPF");
+                    String email = rs.getString("EMAIL");
+                    String senha = rs.getString("SENHA");
+                    cliente = new Cliente(nome, cpf, email, senha);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                // Fechar recursos (ResultSet, PreparedStatement) aqui
+                try {
+                    if (rs != null) rs.close();
+                    if (stmt != null) stmt.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            return cliente;
+        }
+
 }
 
 

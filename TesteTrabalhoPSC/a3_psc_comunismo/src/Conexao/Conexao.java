@@ -1,37 +1,35 @@
 package Conexao;
 
-import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class Conexao {
-    private static Conexao instancia;
-    private Connection conexao;
 
-    private static final String url = "jdbc:mysql://localhost:3306/testedb";
-    private static final String user = "root";
-    private static final String password = "54678";
+    private static final String URL = "jdbc:mysql://localhost:3306/testedb";
+    private static final String USUARIO = "root";
+    private static final String SENHA = "54678";
 
-    private Conexao() throws SQLException {
-        this.conexao = DriverManager.getConnection(url, user, password);
+    private static Connection conexao = null;
+
+    private Conexao() {
+        // Construtor privado para evitar instanciação direta
     }
 
-    public static Conexao getConexao() throws SQLException {
-        if (instancia == null) {
-            instancia = new Conexao();
+    public static Connection getConexao() throws SQLException {
+        if (conexao == null || conexao.isClosed()) {
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+                conexao = DriverManager.getConnection(URL, USUARIO, SENHA);
+            } catch (ClassNotFoundException e) {
+                throw new SQLException("Driver JDBC não encontrado.", e);
+            }
         }
-        return instancia;
-    }
-
-    public Connection getConnection() {
         return conexao;
     }
 
-    // Método para fechar a conexão (opcional)
-    public void closeConnection() throws SQLException {
-        if (conexao != null && !conexao.isClosed()) {
-            conexao.close();
-        }
+    public static PreparedStatement prepareStatement(String sql) throws SQLException {
+        return getConexao().prepareStatement(sql);
     }
 }

@@ -19,8 +19,8 @@ public class Cliente extends Pessoa {
      * @param email  o email do cliente.
      * @param senha  a senha do cliente.
      */
-    public Cliente(int id, String nome, String cpf, String email, String senha) {
-        super(id, nome, cpf, email, senha);
+    public Cliente(String nome, String cpf, String email, String senha) {
+        super(nome, cpf, email, senha);
         this.reservas = new ArrayList<>();
     }
 

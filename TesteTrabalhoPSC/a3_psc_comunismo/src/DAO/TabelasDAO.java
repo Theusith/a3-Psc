@@ -7,54 +7,11 @@ import java.sql.SQLException;
 import Entity.Usuarios;
 import Entity.TabelaReservas;
 import Conexao.Conexao;
+import Model.Cliente;
 
 public class TabelasDAO {
 
-    public void cadastrarUsuario(Usuarios dados) {
-        Connection conn = null;
-        PreparedStatement psDados = null;
-    
-        String sqlDados = "INSERT INTO DADOS (NOME, CPF, EMAIL, SENHA) VALUES (?, ?, ?, ?)";
-    
-        try {
-            conn = (Connection) Conexao.getConexao();
-            conn.setAutoCommit(false); // Desabilita autocommit para transação
-    
-            // Inserção na tabela USUARIO
-            psDados = conn.prepareStatement(sqlDados, PreparedStatement.RETURN_GENERATED_KEYS);
-            psDados.setString(1, dados.getNome());
-            psDados.setString(2, dados.getCpf());
-            psDados.setString(3, dados.getEmail());
-            psDados.setString(4, dados.getSenha());
-            psDados.executeUpdate();
-    
-            // Recuperar o ID gerado
-            ResultSet rs = psDados.getGeneratedKeys();
-            if (rs != null && rs.next()) {
-                int codigoUsuario = rs.getInt(1);
-                // Você pode usar o códigoUsuario para o que precisar.
-            }
-    
-            conn.commit(); // Commit da transação
-    
-        } catch (SQLException e) {
-            if (conn != null) {
-                try {
-                    conn.rollback(); // Rollback em caso de erro
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            }
-            e.printStackTrace();
-        } finally {
-            try {
-                if (psDados != null) psDados.close();
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+
     
    public void cadastrarReserva(TabelaReservas tabelaReservas) {
     Connection conn = null;
@@ -102,5 +59,7 @@ public class TabelasDAO {
             e.printStackTrace();
         }
     }
-}
+    }
+
+
 }

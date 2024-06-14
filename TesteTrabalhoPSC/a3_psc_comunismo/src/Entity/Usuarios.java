@@ -2,7 +2,7 @@ package Entity;
 
 public class Usuarios {
 
-    private int codigo;
+    private int id;
     private String nome;
     private String cpf;
     private String email;
