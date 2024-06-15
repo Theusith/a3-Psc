@@ -1,6 +1,9 @@
 package Controller;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
 import Conexao.Conexao;
 
 import Model.Administrador;
@@ -14,6 +17,7 @@ public class GerenciadorContas {
         adicionarAdministradorPadrao();
 
     }
+
     public void cadastrarCliente(Cliente usuario) {
         Connection conn = null;
         PreparedStatement psDados = null;
@@ -55,7 +59,7 @@ public class GerenciadorContas {
         }
     }
 
-    private void adicionarAdministradorPadrao() {
+    public void adicionarAdministradorPadrao() {
         boolean adicionado = false;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -125,78 +129,160 @@ public class GerenciadorContas {
         }
     }
 
-        public Pessoa autenticarPessoa (String email, String senha){
-            PreparedStatement stmt = null;
-            ResultSet rs = null;
-            Pessoa cl = null;
+    public Pessoa autenticarPessoa (String email, String senha){
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        Pessoa cl = null;
 
+        try {
+            Connection conexao = Conexao.getConexao();
+            String sql = "SELECT * FROM usuarios WHERE email = ? and senha = ?";
+            stmt = conexao.prepareStatement(sql);
+            stmt.setString(1, email);
+            stmt.setString(2, senha);
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                int id1 = rs.getInt("ID");
+                String nome = rs.getString("NOME");
+                String cpf = rs.getString("CPF");
+                email = rs.getString("EMAIL");
+                senha = rs.getString("SENHA");
+                String matricula = rs.getString("MATRICULA");
+                String tipo = rs.getString("TIPO");
+                cl = new Pessoa(nome, cpf, email, senha);
+                cl.setId(id1);
+                cl.setTipo(tipo);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            // Fechar recursos (ResultSet, PreparedStatement) aqui
             try {
-                Connection conexao = Conexao.getConexao();
-                String sql = "SELECT * FROM usuarios WHERE email = ? and senha = ?";
-                stmt = conexao.prepareStatement(sql);
-                stmt.setString(1, email);
-                stmt.setString(2, senha);
-                rs = stmt.executeQuery();
-
-                if (rs.next()) {
-                    int id1 = rs.getInt("ID");
-                    String nome = rs.getString("NOME");
-                    String cpf = rs.getString("CPF");
-                    email = rs.getString("EMAIL");
-                    senha = rs.getString("SENHA");
-                    String matricula = rs.getString("MATRICULA");
-                    String tipo = rs.getString("TIPO");
-                    cl = new Pessoa(nome, cpf, email, senha);
-                    cl.setTipo(tipo);
-                }
-
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
             } catch (SQLException e) {
                 e.printStackTrace();
-            } finally {
-                // Fechar recursos (ResultSet, PreparedStatement) aqui
-                try {
-                    if (rs != null) rs.close();
-                    if (stmt != null) stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
             }
-            return cl; // Pessoa não encontrada ou senha incorreta
         }
+        return cl; // Pessoa não encontrada ou senha incorreta
+    }
 
-        public Cliente obterClientePorId ( int id){
-            Cliente cliente = null;
-            PreparedStatement stmt = null;
-            ResultSet rs = null;
+    public Cliente obterClientePorId ( int id){
+        Cliente cliente = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
 
+        try {
+            Connection conexao = Conexao.getConexao(); // Obtém a conexão existente
+            String sql = "SELECT * FROM usuarios WHERE id = ?"; // Sua consulta SQL
+            stmt = conexao.prepareStatement(sql);
+            stmt.setInt(1, id);
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                String id1 = rs.getString("id");
+                String nome = rs.getString("NOME");
+                String cpf = rs.getString("CPF");
+                String email = rs.getString("EMAIL");
+                String senha = rs.getString("SENHA");
+                cliente = new Cliente(nome, cpf, email, senha);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            // Fechar recursos (ResultSet, PreparedStatement) aqui
             try {
-                Connection conexao = Conexao.getConexao(); // Obtém a conexão existente
-                String sql = "SELECT * FROM usuarios WHERE id = ?"; // Sua consulta SQL
-                stmt = conexao.prepareStatement(sql);
-                stmt.setInt(1, id);
-                rs = stmt.executeQuery();
-
-                if (rs.next()) {
-                    String id1 = rs.getString("id");
-                    String nome = rs.getString("NOME");
-                    String cpf = rs.getString("CPF");
-                    String email = rs.getString("EMAIL");
-                    String senha = rs.getString("SENHA");
-                    cliente = new Cliente(nome, cpf, email, senha);
-                }
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
             } catch (SQLException e) {
                 e.printStackTrace();
-            } finally {
-                // Fechar recursos (ResultSet, PreparedStatement) aqui
-                try {
-                    if (rs != null) rs.close();
-                    if (stmt != null) stmt.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
             }
-            return cliente;
         }
+        return cliente;
+    }
+
+    public void deletarClientePorId(int idCliente) {
+        String sql = "DELETE FROM usuarios WHERE id = ? AND tipo = 'Cliente'"; // Verifica se é cliente
+
+        try (Connection conexao = Conexao.getConexao();
+             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+
+            stmt.setInt(1, idCliente);
+            int linhasAfetadas = stmt.executeUpdate();
+
+            if (linhasAfetadas > 0) {
+                System.out.println("Cliente deletado com sucesso!");
+            } else {
+                System.out.println("Cliente não encontrado ou não é um cliente.");
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao deletar cliente: " + e.getMessage());
+            // Tratar o erro de forma mais adequada (rollback, log, etc.)
+        }
+    }
+
+    public void alterarClientePorId(int idCliente, Cliente novosDados) {
+        String sql = "UPDATE usuarios SET nome = ?, cpf = ?, email = ?, senha = ? WHERE id = ? AND tipo = 'Cliente'";
+
+        try (Connection conexao = Conexao.getConexao();
+             PreparedStatement stmt = conexao.prepareStatement(sql)) {
+
+            stmt.setString(1, novosDados.getNome());
+            stmt.setString(2, novosDados.getCpf());
+            stmt.setString(3, novosDados.getEmail());
+            stmt.setString(4, novosDados.getSenha());
+            stmt.setInt(5, idCliente);
+
+            int linhasAfetadas = stmt.executeUpdate();
+
+            if (linhasAfetadas > 0) {
+                System.out.println("Dados do cliente atualizados com sucesso!");
+            } else {
+                System.out.println("Cliente não encontrado ou não é um cliente.");
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao atualizar dados do cliente: " + e.getMessage());
+            // Tratar o erro de forma mais adequada (rollback, log, etc.)
+        }
+    }
+
+    public List<Cliente> visualizarClientes() {
+        List<Cliente> clientes = new ArrayList<>();
+        String sql = "SELECT * FROM usuarios WHERE tipo = 'Cliente'";
+
+        try (Connection conexao = Conexao.getConexao();
+             PreparedStatement stmt = conexao.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+
+                int id = (rs.getInt("id"));
+                String nome = (rs.getString("nome"));
+                String cpf = (rs.getString("cpf"));
+                String email = (rs.getString("email"));
+
+                Cliente cliente = new Cliente(nome, cpf, email, "0");
+                cliente.setId(rs.getInt("id"));
+                cliente.setNome(rs.getString("nome"));
+                cliente.setCpf(rs.getString("cpf"));
+                cliente.setEmail(rs.getString("email"));
+                clientes.add(cliente);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao visualizar clientes: " + e.getMessage());
+            // Tratar o erro de forma mais adequada (rollback, log, etc.)
+        }
+
+        return clientes;
+    }
+
+
+
 
 }
 

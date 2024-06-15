@@ -29,14 +29,6 @@ public class Pessoa {
         this.matricula = matricula;
     }
 
-    public int getiD() {
-        return iD;
-    }
-
-    public void setiD(int iD) {
-        this.iD = iD;
-    }
-
     protected String matricula;
 
 
@@ -47,11 +39,11 @@ public class Pessoa {
         this.senha = senha;
     }
 
-    /**
-     * Obtém o identificador único da pessoa.
-     *
-     * @return o identificador da pessoa.
-     */
+    public void setId(int iD) {
+        this.iD = iD;
+    }
+
+
     public int getId() {
         return iD;
     }

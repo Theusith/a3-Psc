@@ -13,14 +13,13 @@ public class Reserva {
     private int idCliente;
     private String origem;
     private String destino;
-    private Date dataViagem;
+    private String dataViagem;
 
 
-    public Reserva(int idCliente, String origem, int idReserva, String destino, Date dataViagem) {
+    public Reserva(int idCliente, String origem, String destino, String dataViagem) {
 
         this.idCliente = idCliente;
         this.origem = origem;
-        this.idReserva = idReserva;
         this.destino = destino;
         this.dataViagem = dataViagem;
     }
@@ -62,18 +61,17 @@ public class Reserva {
     }
 
 
-    public java.sql.Date getDataViagem() {
-        return (java.sql.Date) dataViagem;
+    public String getDataViagem() {
+        return  dataViagem;
     }
 
 
-    public void setDataViagem(Date dataViagem) {
+    public void setDataViagem(String dataViagem) {
         this.dataViagem = dataViagem;
     }
 
     @Override
     public String toString() {
-        System.out.print("\nReserva:  ");
         return "\nId = " + idReserva + "\nOrigem: " + origem + "\nDestino: " + destino + "\nData de viagem: " + dataViagem;
     }
 }

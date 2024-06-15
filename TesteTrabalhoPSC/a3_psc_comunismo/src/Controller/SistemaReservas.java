@@ -131,16 +131,18 @@ public class SistemaReservas {
                     criarNovaReserva(pessoaLogada);
                     break;
                 case '2':
-                    pessoaLogada.getReservas(pessoaLogada);
+                    System.out.println(gerenciadorReservas.visualizarReservasPorCliente(pessoaLogada.getId()));
                     break;
                 case '3':
                     editarReserva(pessoaLogada);
                     break;
                 case '4':
-                    excluirReserva(pessoaLogada);
+                    excluirReserva();
                     break;
                 case '5':
                     //excluirConta(cliente);
+                    gerenciadorContas.deletarClientePorId(pessoaLogada.getId());
+                    gerenciadorReservas.deletarReservasPorCliente(pessoaLogada.getId());
                     sair = true; // Forçar logout após excluir conta
                     break;
                 case '6':
@@ -159,7 +161,8 @@ public class SistemaReservas {
             System.out.println("1. Alterar dados pessoais de um cliente por ID");
             System.out.println("2. Exibir reservas de um cliente");
             System.out.println("3. Excluir conta de um cliente");
-            System.out.println("4. Logout");
+            System.out.println("4. Visualizar clientes");
+            System.out.println("5. Logout");
             System.out.print("Escolha uma opção: ");
 
             int opcao = scanner.nextInt();
@@ -182,9 +185,11 @@ public class SistemaReservas {
                 case 3:
                     System.out.println("Digite o ID:");
                     int id = scanner.nextInt();
-      //              gerenciadorContas.removerCliente(id);
+                    gerenciadorContas.deletarClientePorId(id);
                     break;
                 case 4:
+                    gerenciadorContas.visualizarClientes();
+                case 5:
                     sair = true;
                     break;
                 default:
@@ -206,31 +211,31 @@ public class SistemaReservas {
         if (clienteParaAlterar == null) {
             System.out.println("Cliente não encontrado.");
             return;
+        }else{
+            System.out.println("Alterando dados de: " + clienteParaAlterar.getNome());
+            System.out.print("Novo nome: ");
+            String novoNome = scanner.nextLine();
+            System.out.print("Novo CPF: ");
+            String novoCpf = scanner.nextLine();
+            System.out.print("Novo email: ");
+            String novoEmail = scanner.nextLine();
+            System.out.print("Nova senha: ");
+            String novaSenha = scanner.nextLine();
+
+            clienteParaAlterar.setNome(novoNome);
+            clienteParaAlterar.setCpf(novoCpf);
+            clienteParaAlterar.setEmail(novoEmail);
+            clienteParaAlterar.setSenha(novaSenha);
+
+            gerenciadorContas.alterarClientePorId(idCliente, clienteParaAlterar);
+
+            System.out.println("Dados alterados com sucesso!");
         }
 
-        System.out.println("Alterando dados de: " + clienteParaAlterar.getNome());
-        System.out.print("Novo nome: ");
-        String novoNome = scanner.nextLine();
-        System.out.print("Novo CPF: ");
-        String novoCpf = scanner.nextLine();
-        System.out.print("Novo email: ");
-        String novoEmail = scanner.nextLine();
-        System.out.print("Nova senha: ");
-        String novaSenha = scanner.nextLine();
 
-        clienteParaAlterar.setNome(novoNome);
-        clienteParaAlterar.setCpf(novoCpf);
-        clienteParaAlterar.setEmail(novoEmail);
-        clienteParaAlterar.setSenha(novaSenha);
-
-        System.out.println("Dados alterados com sucesso!");
     }
 
-    /**
-     * Cria uma nova reserva para um cliente.
-     *
-     * @param cliente o cliente para o qual a reserva será criada.
-     */
+
     private void criarNovaReserva(Pessoa pessoaLogada) {
         boolean sair = false;
         while (!sair) {
@@ -243,10 +248,12 @@ public class SistemaReservas {
             SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
 
             System.out.print("Data de Viagem (DD/MM/AAAA): ");
-            String dataViagem1 = scanner.nextLine();
-            Date dataViajem = new Date(dataViagem1);
+            String dataViagem = scanner.nextLine();
 
-            Reserva novaReserva = new Reserva();
+
+            Reserva novaReserva = new Reserva(pessoaLogada.getId(), origem, destino, dataViagem);
+            gerenciadorReservas.adicionarReserva(novaReserva);
+
 
             System.out.println("Reserva criada com sucesso!");
 
@@ -261,24 +268,13 @@ public class SistemaReservas {
         }
     }
 
+    private void editarReserva(Pessoa pessoaLogada) {
 
-    /**
-     * Edita uma reserva existente para um cliente.
-     *
-     * @param cliente o cliente cuja reserva será editada.
-     */
-    private void editarReserva(Cliente cliente) {
+
         System.out.println("=== Editar Reserva ===");
         System.out.print("ID da Reserva: ");
         int idReserva = scanner.nextInt();
         scanner.nextLine(); // Consumir a quebra de linha
-
-        // Obter a reserva com o ID fornecido a partir do gerenciador de reservas
-        Reserva reservaParaEditar = gerenciadorReservas.obterReservaPorId(cliente, idReserva);
-        if (reservaParaEditar == null) {
-            System.out.println("Reserva não encontrada.");
-            return;
-        }
 
         // Solicitar novos detalhes da reserva ao cliente
         System.out.print("Nova Origem: ");
@@ -287,38 +283,25 @@ public class SistemaReservas {
         String novoDestino = scanner.nextLine();
         System.out.print("Nova Data de Viagem (DD/MM/AAAA): ");
         String novaDataViagem = scanner.nextLine();
+        Reserva reservaParaEditar = new Reserva(pessoaLogada.getId(), novaOrigem, novoDestino, novaDataViagem);
+
 
         // Atualizar os detalhes da reserva
         reservaParaEditar.setOrigem(novaOrigem);
         reservaParaEditar.setDestino(novoDestino);
         reservaParaEditar.setDataViagem(novaDataViagem);
+        gerenciadorReservas.editarReserva(pessoaLogada.getId(), idReserva, reservaParaEditar);
 
-        System.out.println("Reserva atualizada com sucesso!");
+        return ;
     }
-
-    /**
-     * Exclui uma reserva existente para um cliente.
-     *
-     * @param cliente o cliente cuja reserva será excluída.
-     */
-    private void excluirReserva(Cliente cliente) {
+    private void excluirReserva() {
         System.out.println("=== Excluir Reserva ===");
         System.out.print("ID da Reserva: ");
         int idReserva = scanner.nextInt();
         scanner.nextLine(); // Consumir a quebra de linha
-
-        // Obter a reserva com o ID fornecido a partir do gerenciador de reservas
-        Reserva reservaParaExcluir = gerenciadorReservas.obterReservaPorId(cliente, idReserva);
-        if (reservaParaExcluir == null) {
-            System.out.println("Reserva não encontrada.");
-            return;
-        }
-
-        // Remover a reserva do cliente
-        cliente.removerReserva(reservaParaExcluir);
-
-        System.out.println("Reserva excluída com sucesso!");
+        gerenciadorReservas.deletarReservaPorId(idReserva);
     }
+
 }
 
 
