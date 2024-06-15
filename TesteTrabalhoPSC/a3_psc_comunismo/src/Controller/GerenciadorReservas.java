@@ -72,16 +72,21 @@ public class GerenciadorReservas {
         }
         return reservas;
     }
-    public void editarReserva(int idCliente, int idReserva, Reserva reservaAtualizada) {
-        String sql = "UPDATE reservas SET origem = ?, destino = ?, dataViagem = ? WHERE idReserva = ? AND idCLiente = ?";
+    public void editarReserva(int idCliente, int idReservas, Reserva reservaAtualizada) {
+        String sql = "UPDATE reservas SET origem = ?, destino = ?, dataViagem = ? WHERE idReservas = ? AND idCLiente = ?";
 
         try (Connection conexao = Conexao.getConexao();
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
             stmt.setString(1, reservaAtualizada.getOrigem());
             stmt.setString(2, reservaAtualizada.getDestino());
-            stmt.setDate(3, java.sql.Date.valueOf( reservaAtualizada.getDataViagem()));
-            stmt.setInt(4, idReserva);
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy"); // Ajuste o padrão conforme necessário
+            LocalDate localDate = LocalDate.parse(reservaAtualizada.getDataViagem(), formatter);
+            Date sqlDate = Date.valueOf(localDate);
+
+            stmt.setDate(3, sqlDate);// Certifique-se de que o tipo de dado da coluna dataViagem no banco seja compatível
+            stmt.setInt(4, idReservas);
             stmt.setInt(5, idCliente); // Adiciona a condição para o idCliente
 
             int linhasAfetadas = stmt.executeUpdate();
@@ -98,13 +103,13 @@ public class GerenciadorReservas {
         }
     }
 
-    public void deletarReservaPorId(int idReserva) {
-        String sql = "DELETE FROM reservas WHERE idReserva = ?";
+    public void deletarReservaPorId(int idReservas) {
+        String sql = "DELETE FROM reservas WHERE idReservas = ?";
 
         try (Connection conexao = Conexao.getConexao();
              PreparedStatement stmt = conexao.prepareStatement(sql)) {
 
-            stmt.setInt(1, idReserva);
+            stmt.setInt(1, idReservas);
             int linhasAfetadas = stmt.executeUpdate();
 
             if (linhasAfetadas > 0) {
