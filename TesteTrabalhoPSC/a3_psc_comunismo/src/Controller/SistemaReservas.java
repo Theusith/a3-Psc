@@ -5,6 +5,8 @@ import Model.Cliente;
 import Model.Pessoa;
 import Model.Reserva;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -79,7 +81,7 @@ public class SistemaReservas {
             if (Objects.equals(pessoaLogada.getTipo(), "Administrador")) {
                 exibirMenuAdministrador();
             } else if (Objects.equals(pessoaLogada.getTipo(), "Cliente")) {
-                exibirMenuPrincipal();
+                exibirMenuPrincipal(pessoaLogada);
             }
         } else {
             System.out.println("Email ou senha incorretos. Tente novamente.");
@@ -110,7 +112,7 @@ public class SistemaReservas {
     }
 
 
-    private void exibirMenuPrincipal() {
+    private void exibirMenuPrincipal(Pessoa pessoaLogada) {
         boolean sair = false;
         while (!sair) {
             System.out.println("\n=== Menu Principal ===");
@@ -129,7 +131,7 @@ public class SistemaReservas {
                     criarNovaReserva(pessoaLogada);
                     break;
                 case '2':
-                    pessoaLogada.getReservas();
+                    pessoaLogada.getReservas(pessoaLogada);
                     break;
                 case '3':
                     editarReserva(pessoaLogada);
@@ -149,20 +151,6 @@ public class SistemaReservas {
             }
         }
     }
-
-
-//    private void excluirConta(Cliente cliente) {
-//        System.out.println("=== Excluir Conta ===");
-//        System.out.print("Tem certeza que deseja excluir sua conta? (S/N): ");
-//        String confirmacao = scanner.nextLine();
-//        if (confirmacao.equalsIgnoreCase("S")) {
-//            gerenciadorContas.removerCliente(cliente);
-//            System.out.println("Conta excluída com sucesso!");
-//        } else {
-//            System.out.println("Operação cancelada.");
-//        }
-//    }
-
 
     private void exibirMenuAdministrador() {
         boolean sair = false;
@@ -243,36 +231,27 @@ public class SistemaReservas {
      *
      * @param cliente o cliente para o qual a reserva será criada.
      */
-    private void criarNovaReserva(Cliente cliente) {
+    private void criarNovaReserva(Pessoa pessoaLogada) {
         boolean sair = false;
         while (!sair) {
-            TabelaReservas t = new TabelaReservas();
+
             System.out.println("=== Criar Nova Reserva ===");
             System.out.print("Origem: ");
             String origem = scanner.nextLine();
-            t.setOrigem(origem);
             System.out.print("Destino: ");
             String destino = scanner.nextLine();
-            t.setDestino(destino);
+            SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+
+            System.out.print("Data de Viagem (DD/MM/AAAA): ");
+            String dataViagem1 = scanner.nextLine();
+            Date dataViajem = new Date(dataViagem1);
+
+            Reserva novaReserva = new Reserva();
+
+            System.out.println("Reserva criada com sucesso!");
 
             // Verificar se a origem e o destino não são iguais
-            if (!origem.equalsIgnoreCase(destino)) {
-                System.out.print("Data de Viagem (DD/MM/AAAA): ");
-                String dataViagem = scanner.nextLine();
-                t.setDataViagem(dataViagem);
 
-                new TabelasDAO().cadastrarReserva(t);
-
-                // Criar uma nova reserva com os detalhes fornecidos
-                Reserva novaReserva = new Reserva(cliente, origem, destino, dataViagem);
-
-                // Adicionar a nova reserva ao cliente
-                cliente.adicionarReserva(novaReserva);
-
-                System.out.println("Reserva criada com sucesso!");
-            } else {
-                System.out.println("Destino informado não pode ser igual a Origem, tente novamente.");
-            }
 
             System.out.print("Deseja fazer mais alguma reserva? (S/N): ");
             String confirmacao = scanner.nextLine();

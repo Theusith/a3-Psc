@@ -1,5 +1,7 @@
 package Model;
 
+import java.util.Date;
+
 /**
  * Representa uma reserva no sistema de reservas.
  * Uma reserva contém informações sobre a pessoa, origem, destino e data da viagem.
@@ -7,38 +9,38 @@ package Model;
 public class Reserva {
 
 
-    private int id;
-    private Pessoa pessoa;
+    private int idReserva;
+    private int idCliente;
     private String origem;
     private String destino;
-    private String dataViagem;
+    private Date dataViagem;
 
 
-    public Reserva(Pessoa pessoa, String origem, String destino, String dataViagem) {
-        this.pessoa = pessoa;
+    public Reserva(int idCliente, String origem, int idReserva, String destino, Date dataViagem) {
+
+        this.idCliente = idCliente;
         this.origem = origem;
+        this.idReserva = idReserva;
         this.destino = destino;
         this.dataViagem = dataViagem;
     }
 
-    public int getId() {
-        return id;
+    public int getIdCliente() {
+        return idCliente;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-
-    public Pessoa getCliente() {
-        return pessoa;
+    public void setIdCliente(int idCliente) {
+        this.idCliente = idCliente;
     }
 
 
-    public void setCliente(Pessoa pessoa) {
-        this.pessoa = pessoa;
+    public int getIdReserva() {
+        return idReserva;
     }
 
+    public void setIdReserva(int idReserva) {
+        this.idReserva = idReserva;
+    }
 
     public String getOrigem() {
         return origem;
@@ -60,18 +62,18 @@ public class Reserva {
     }
 
 
-    public String getDataViagem() {
-        return dataViagem;
+    public java.sql.Date getDataViagem() {
+        return (java.sql.Date) dataViagem;
     }
 
 
-    public void setDataViagem(String dataViagem) {
+    public void setDataViagem(Date dataViagem) {
         this.dataViagem = dataViagem;
     }
 
     @Override
     public String toString() {
         System.out.print("\nReserva:  ");
-        return "\nId = " + id + "\nOrigem: " + origem + "\nDestino: " + destino + "\nData de viagem: " + dataViagem;
+        return "\nId = " + idReserva + "\nOrigem: " + origem + "\nDestino: " + destino + "\nData de viagem: " + dataViagem;
     }
 }
