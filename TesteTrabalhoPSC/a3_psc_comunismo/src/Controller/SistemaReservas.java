@@ -1,6 +1,5 @@
 package Controller;
 
-
 import Model.Cliente;
 import Model.Pessoa;
 import Model.Reserva;
@@ -8,30 +7,18 @@ import java.text.SimpleDateFormat;
 import java.util.Objects;
 import java.util.Scanner;
 
-
-/**
- * Classe principal do sistema de reservas, responsável por gerenciar o fluxo de execução do sistema.
- */
 public class SistemaReservas {
 
     private GerenciadorContas gerenciadorContas;
     private GerenciadorReservas gerenciadorReservas;
     private Scanner scanner;
 
-    /**
-     * Construtor da classe SistemaReservas.
-     * Inicializa os gerenciadores de contas e reservas, além do scanner para entrada de dados.
-     */
     public SistemaReservas() {
         this.gerenciadorContas = new GerenciadorContas();
         this.gerenciadorReservas = new GerenciadorReservas();
         this.scanner = new Scanner(System.in);
     }
 
-    /**
-     * Método principal para executar o sistema de reservas.
-     * Exibe o menu principal e processa as opções selecionadas pelo usuário.
-     */
     public void executar() {
         boolean sair = false;
         while (!sair) {
@@ -59,18 +46,12 @@ public class SistemaReservas {
         }
     }
 
-    /**
-     * Método para realizar o login de um usuário.
-     * Solicita as credenciais e autentica o usuário.
-     */
     private void fazerLogin() {
         System.out.println("=== Fazer Login ===");
         System.out.print("Email: ");
         String email = scanner.nextLine();
         System.out.print("Senha: ");
         String senha = scanner.nextLine();
-
-
 
         // Verificar se as credenciais correspondem a alguma conta
         Pessoa pessoaLogada = gerenciadorContas.autenticarPessoa(email, senha);
@@ -86,10 +67,6 @@ public class SistemaReservas {
         }
     }
 
-    /**
-     * Método para criar uma nova conta de cliente.
-     * Solicita os dados do cliente e cria a conta.
-     */
     private void criarConta() {
         System.out.println("=== Criar Conta ===");
         System.out.print("Nome: ");
@@ -106,7 +83,6 @@ public class SistemaReservas {
 
         new GerenciadorContas().cadastrarCliente(l);
     }
-
 
     private void exibirMenuPrincipal(Pessoa pessoaLogada) {
         boolean sair = false;
@@ -196,9 +172,6 @@ public class SistemaReservas {
         }
     }
 
-    /**
-     * Altera os dados de um cliente por ID.
-     */
     private void alterarDadosClientePorId() {
         System.out.println("=== Alterar Dados de Cliente ===");
         System.out.print("ID do cliente: ");
@@ -232,7 +205,6 @@ public class SistemaReservas {
 
 
     }
-
 
     private void criarNovaReserva(Pessoa pessoaLogada) {
         boolean sair = false;
@@ -286,6 +258,7 @@ public class SistemaReservas {
 
         return ;
     }
+
     private void excluirReserva() {
         System.out.println("=== Excluir Reserva ===");
         System.out.print("ID da Reserva: ");

@@ -16,7 +16,6 @@ public class Conexao {
     private Conexao() {
         // Construtor privado para evitar instanciação direta
     }
-
     public static Connection getConexao() throws SQLException {
         if (conexao == null || conexao.isClosed()) {
             try {

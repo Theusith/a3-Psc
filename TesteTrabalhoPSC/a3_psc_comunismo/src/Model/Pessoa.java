@@ -48,83 +48,44 @@ public class Pessoa {
         return iD;
     }
 
-    /**
-     * Obtém o nome da pessoa.
-     *
-     * @return o nome da pessoa.
-     */
     public String getNome() {
         return nome;
     }
 
-    /**
-     * Define um novo nome para a pessoa.
-     *
-     * @param nome o novo nome da pessoa.
-     */
     public void setNome(String nome) {
         this.nome = nome;
     }
 
-    /**
-     * Obtém o CPF da pessoa.
-     *
-     * @return o CPF da pessoa.
-     */
+
     public String getCpf() {
         return cpf;
     }
 
-    /**
-     * Define um novo CPF para a pessoa.
-     *
-     * @param cpf o novo CPF da pessoa.
-     */
     public void setCpf(String cpf) {
         this.cpf = cpf;
     }
 
-    /**
-     * Obtém o email da pessoa.
-     *
-     * @return o email da pessoa.
-     */
+
     public String getEmail() {
         return email;
     }
 
-    /**
-     * Define um novo email para a pessoa.
-     *
-     * @param email o novo email da pessoa.
-     */
+
     public void setEmail(String email) {
         this.email = email;
     }
 
-    /**
-     * Obtém a senha da pessoa.
-     *
-     * @return a senha da pessoa.
-     */
+
     public String getSenha() {
         return senha;
     }
 
-    /**
-     * Define uma nova senha para a pessoa.
-     *
-     * @param senha a nova senha da pessoa.
-     */
+
     public void setSenha(String senha) {
         this.senha = senha;
     }
 
-    /**
-     * Retorna uma representação em string dos dados básicos da pessoa.
-     *
-     * @return uma string contendo o nome e o identificador da pessoa.
-     */
+
     @Override
     public String toString() {
         return "Nome: " + nome + "\nId: " + iD;

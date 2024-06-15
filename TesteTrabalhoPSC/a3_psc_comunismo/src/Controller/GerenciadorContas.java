@@ -3,10 +3,7 @@ package Controller;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
 import Conexao.Conexao;
-
-import Model.Administrador;
 import Model.Cliente;
 import Model.Pessoa;
 
@@ -294,9 +291,6 @@ public class GerenciadorContas {
 
         return clientes;
     }
-
-
-
 
 }
 

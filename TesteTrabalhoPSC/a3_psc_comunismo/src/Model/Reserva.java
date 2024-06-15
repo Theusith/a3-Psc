@@ -1,13 +1,6 @@
 package Model;
 
-import java.util.Date;
-
-/**
- * Representa uma reserva no sistema de reservas.
- * Uma reserva contém informações sobre a pessoa, origem, destino e data da viagem.
- */
 public class Reserva {
-
 
     private int idReserva;
     private int idCliente;
@@ -32,7 +25,6 @@ public class Reserva {
         this.idCliente = idCliente;
     }
 
-
     public int getIdReserva() {
         return idReserva;
     }
@@ -45,26 +37,21 @@ public class Reserva {
         return origem;
     }
 
-
     public void setOrigem(String origem) {
         this.origem = origem;
     }
-
 
     public String getDestino() {
         return destino;
     }
 
-
     public void setDestino(String destino) {
         this.destino = destino;
     }
 
-
     public String getDataViagem() {
         return  dataViagem;
     }
-
 
     public void setDataViagem(String dataViagem) {
         this.dataViagem = dataViagem;

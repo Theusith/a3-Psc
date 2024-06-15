@@ -1,7 +1,6 @@
 package Controller;
 
 import Conexao.Conexao;
-import Model.Cliente;
 import Model.Reserva;
 import java.time.format.DateTimeFormatter;
 import java.sql.*;
@@ -10,11 +9,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Classe responsável por gerenciar reservas de clientes.
- */
-public class GerenciadorReservas {
 
+public class GerenciadorReservas {
 
     public void adicionarReserva(Reserva reserva) {
         String sql = "INSERT INTO RESERVAS (idCliente, origem, destino, dataViagem) VALUES (?, ?, ?, ?)";
@@ -72,6 +68,7 @@ public class GerenciadorReservas {
         }
         return reservas;
     }
+
     public void editarReserva(int idCliente, int idReservas, Reserva reservaAtualizada) {
         String sql = "UPDATE reservas SET origem = ?, destino = ?, dataViagem = ? WHERE idReservas = ? AND idCLiente = ?";
 
@@ -144,6 +141,5 @@ public class GerenciadorReservas {
             // Tratar o erro de forma mais adequada (rollback, log, etc.)
         }
     }
-
 
 }
