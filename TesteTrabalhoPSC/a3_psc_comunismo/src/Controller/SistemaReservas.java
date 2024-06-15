@@ -1,17 +1,13 @@
 package Controller;
 
-import Model.Administrador;
+
 import Model.Cliente;
 import Model.Pessoa;
 import Model.Reserva;
-
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Objects;
 import java.util.Scanner;
 
-import DAO.TabelasDAO;
-import Entity.TabelaReservas;
 
 /**
  * Classe principal do sistema de reservas, responsável por gerenciar o fluxo de execução do sistema.
