@@ -21,22 +21,36 @@ public class GerenciadorContas {
     public void cadastrarCliente(Cliente usuario) {
         Connection conn = null;
         PreparedStatement psDados = null;
+        PreparedStatement psVerificarSenha = null; // Para verificar se a senha já existe
 
         String sqlDados = "INSERT INTO USUARIOS (NOME, CPF, EMAIL, SENHA, TIPO) VALUES (?, ?, ?, ?, ?)";
+        String sqlVerificarSenha = "SELECT COUNT(*) FROM USUARIOS WHERE SENHA = ?"; // Consulta para verificar a senha
+
 
         try {
             conn = Conexao.getConexao();
             conn.setAutoCommit(false); // Desabilita autocommit para transação
 
-            // Inserção na tabela USUARIO
-            psDados = conn.prepareStatement(sqlDados, PreparedStatement.RETURN_GENERATED_KEYS);
-            psDados.setString(1, usuario.getNome());
-            psDados.setString(2, usuario.getCpf());
-            psDados.setString(3, usuario.getEmail());
-            psDados.setString(4, usuario.getSenha());
-            psDados.setString(5, usuario.getTipo());
-            psDados.executeUpdate();
-            System.out.println("Usuário cadastrado com sucesso!");
+            psVerificarSenha = conn.prepareStatement(sqlVerificarSenha);
+            psVerificarSenha.setString(1, usuario.getSenha());
+            ResultSet rs = psVerificarSenha.executeQuery();
+            rs.next();
+            int count = rs.getInt(1);
+
+            if (count > 0) {
+                System.out.println("Senha já utilizada por outro usuário. Escolha outra senha.");
+                return;
+            }else{
+                // Inserção na tabela USUARIO
+                psDados = conn.prepareStatement(sqlDados, PreparedStatement.RETURN_GENERATED_KEYS);
+                psDados.setString(1, usuario.getNome());
+                psDados.setString(2, usuario.getCpf());
+                psDados.setString(3, usuario.getEmail());
+                psDados.setString(4, usuario.getSenha());
+                psDados.setString(5, usuario.getTipo());
+                psDados.executeUpdate();
+                System.out.println("Usuário cadastrado com sucesso!");
+            }
 
             conn.commit(); // Commit da transação
 

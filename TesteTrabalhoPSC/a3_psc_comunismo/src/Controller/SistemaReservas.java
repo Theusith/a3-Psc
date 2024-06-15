@@ -107,8 +107,6 @@ public class SistemaReservas {
         l.setTipo(tipo);
 
         new GerenciadorContas().cadastrarCliente(l);
-
-        System.out.println("Conta criada com sucesso!");
     }
 
 
